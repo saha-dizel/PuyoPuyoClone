@@ -89,14 +89,16 @@ public class GameState {
     private void dropIt(Puyo[] drop){
         Control control = new Control();
         //starting position on the field: [0] - [5][2]; [1] - [6][2]
-        drop[0] = field[control.getControlElemY()][control.getControlElemX()];
-        drop[1] = field[control.getNonControlElemY()][control.getNonControlElemX()];
+        field[control.getControlElemY()][control.getControlElemX()].setColor(drop[0].getColor());
+        field[control.getNonControlElemY()][control.getNonControlElemX()].setColor(drop[1].getColor());
 
         //while u can lower it DROP IT
         while(need2Drop(control)){
+            field[control.getControlElemY()][control.getControlElemX()].setColor(PuyoColor.NO);
+            field[control.getNonControlElemY()][control.getNonControlElemX()].setColor(PuyoColor.NO);
             control.lowerBlock();
-            drop[0] = field[control.getControlElemY()][control.getControlElemX()];
-            drop[1] = field[control.getNonControlElemY()][control.getNonControlElemX()];
+            field[control.getControlElemY()][control.getControlElemX()].setColor(drop[0].getColor());
+            field[control.getNonControlElemY()][control.getNonControlElemX()].setColor(drop[1].getColor());
         }
     }
 
