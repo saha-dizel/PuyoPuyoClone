@@ -8,42 +8,55 @@ public class GameState {
     private Puyo[] drop;
     private long score;
     private Random blessRNG;
+    private int count = 0;
 
     GameState(){
-        field = new Puyo[12][6];
-        for(Puyo[] e: field)
-            for (Puyo g: e)
-                g = new Puyo();
+        //initialising field
+        field = new Puyo[18][6];
+
+        for (int i = 0; i < 18; i++){
+            for (int j= 0; j < 6; j++)
+                field[i][j] = new Puyo();
+        }
 
         score = 0;
 
         //getting random seed
         blessRNG = new Random(System.currentTimeMillis());
 
+        //initialising first pair
         next = genNext();
+
+        //starting the game loop
+        int gameRes = mainLoop();
+
+        //maybe add records, if feeling fancy
     }
 
-    public int mainLoop(){
-        drop = genDrop(next);
+    private int mainLoop(){
+        while(true) {
+            drop = genDrop(next);
 
-        next = genNext();
+            next = genNext();
 
-        //player drops puyo on the field
+            //player drops puyo on the field
+            dropIt(drop);
 
-        //count score here as well
-        field = clearPuyo(field);
+            //count score here as well
+            field = clearPuyo(field);
 
-        if(isGameOver(field))
-            return 0;
+            count++;
 
+            if (isGameOver(field))
+                return count;
+        }
         //if not => repeat loop
 
         //if lost => return 0
         //if exit from pause (if u will do pause, lol) => return 1
-        return 1;
     }
 
-    public Puyo[] genNext(){
+    private Puyo[] genNext(){
         Puyo[] nextBlock = new Puyo[2];
         nextBlock[0] = new Puyo(blessRNG);
         nextBlock[1] = new Puyo(blessRNG);
@@ -51,7 +64,7 @@ public class GameState {
         return nextBlock;
     }
 
-    public Puyo[] genDrop(Puyo[] next){
+    private Puyo[] genDrop(Puyo[] next){
         Puyo[] newDrop = new Puyo[2];
         newDrop[0] = next[0];
         newDrop[1] = next[1];
@@ -59,25 +72,59 @@ public class GameState {
         return newDrop;
     }
 
-    public Puyo[][] clearPuyo(Puyo[][] field){
-        /*TIER LISTS EXISTED IN PUYO PUYO! OMG*/
+    //check if you can drop it
+    private boolean need2Drop(Control control){
+        if (control.getLower() < 17) {
+            if (control.getOrientation() % 2 == 0 &&
+                    field[control.getLower() + 1][control.getControlElemX()].getColor() == PuyoColor.NO ||
+                    control.getOrientation() % 2 == 1 &&
+                            field[control.getLower() + 1][control.getControlElemX()].getColor() == PuyoColor.NO &&
+                            field[control.getLower() + 1][control.getNonControlElemX()].getColor() == PuyoColor.NO)
+                return true;
+            else return false;
+        }
+        else return false;
+    }
 
+    private void dropIt(Puyo[] drop){
+        Control control = new Control();
+        //starting position on the field: [0] - [5][2]; [1] - [6][2]
+        drop[0] = field[control.getControlElemY()][control.getControlElemX()];
+        drop[1] = field[control.getNonControlElemY()][control.getNonControlElemX()];
+
+        //while u can lower it DROP IT
+        while(need2Drop(control)){
+            control.lowerBlock();
+            drop[0] = field[control.getControlElemY()][control.getControlElemX()];
+            drop[1] = field[control.getNonControlElemY()][control.getNonControlElemX()];
+        }
+    }
+
+    private Puyo[][] clearPuyo(Puyo[][] field){
         //go through the field, if can clear something, then count it, clear it, add score and then
-        //field = this.clearPuyo(field);
+        //field = clearPuyo(field);
 
         //about score: add it by using this simplified formula: score += 10 * (clearedPuyoCount + chainNum - 1)
 
         return field;
     }
 
-    private boolean isGameOver(Puyo[][] field){
-        if (field[0][2] != null)
+    //public just for test purposes, change to private after
+    public boolean isGameOver(Puyo[][] field){
+        if (field[6][2].getColor() != PuyoColor.NO)
             return true;
         else
             return false;
     }
 
+    public int getCount(){
+        return count;
+    }
+
     public Random getBlessRNG() {
         return blessRNG;
+    }
+    public Puyo[][] getField() {
+        return field;
     }
 }

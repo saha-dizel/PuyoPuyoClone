@@ -3,24 +3,24 @@ package com.BuyoBuyo;
 import java.util.Random;
 
 public class Puyo {
-    private puyoColor color;
+    private PuyoColor color;
 
     Puyo(){
-        color = null;
+        color = PuyoColor.NO;
     }
 
     Puyo(Random blessRNG){
-        int pick = blessRNG.nextInt(puyoColor.values().length);
-        color = puyoColor.values()[pick];
+        int pick = blessRNG.nextInt(PuyoColor.values().length - 1);
+        color = PuyoColor.values()[pick];
     }
 
-    public puyoColor getColor() {
+    public PuyoColor getColor() {
         return color;
     }
 
-    public void setColor(puyoColor color) {
+    public void setColor(PuyoColor color) {
         this.color = color;
     }
 }
 
-enum puyoColor {RED, BLUE, GREEN, PURPLE}
+enum PuyoColor {RED, BLUE, GREEN, PURPLE, NO}
